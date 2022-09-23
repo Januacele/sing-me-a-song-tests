@@ -6,7 +6,6 @@ import {
 } from "../factories/recomendationsFactory.js";
 import { Recommendation } from "@prisma/client";
 import { faker } from "@faker-js/faker";
-import { parse } from "path";
 
 const agent = supertest(app);
 
