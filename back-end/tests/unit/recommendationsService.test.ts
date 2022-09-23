@@ -9,8 +9,6 @@ import {
     updatedRecommendation,
     registeredSongName
 } from "../factories/recomendationsFactory";
-import { IntervalHistogram } from "perf_hooks";
-import exp from "constants";
 
 
 beforeEach(async () => {
