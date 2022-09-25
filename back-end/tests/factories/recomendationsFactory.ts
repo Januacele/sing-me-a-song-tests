@@ -56,3 +56,14 @@ export async function registeredSongName(){
 
     return name;
 }
+
+
+export async function getRecommendationById(id: number){
+    const recommendation = await prisma.recommendation.findUnique({
+        where : {
+            id,
+        },
+    });
+
+    return recommendation;
+}

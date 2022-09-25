@@ -66,3 +66,7 @@ describe("POST /recommendations/top/:amount", () => {
         expect(result.status).toEqual(500);
     });
 });
+
+afterAll(async () => {
+    await prisma.$disconnect();
+  });
