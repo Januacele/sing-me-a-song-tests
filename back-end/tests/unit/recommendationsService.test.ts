@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
 import prisma from "../../src/database";
-import { recommendationService, CreateRecommendationData } from "../../src/services/recommendationsService";
+import { recommendationService } from "../../src/services/recommendationsService";
 import { recommendationRepository } from "../../src/repositories/recommendationRepository";
 import {
     createNewRecommendation,
@@ -33,7 +33,7 @@ describe("recommendation services unit test suite", () => {
         jest.spyOn(recommendationRepository, "findByName").mockImplementationOnce(():any => []);
         
         const registeredName = await registeredSongName();
-        let createData = await insertNewRecommendation();
+        const createData = await insertNewRecommendation();
         createData.name = registeredName;
 
         const result = recommendationService.insert(createData);
