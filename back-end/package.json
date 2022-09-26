@@ -9,8 +9,8 @@
     "start": "ts-node src/server.js",
     "dev": "nodemon src/server.ts",
     "prisma": "prisma migrate dev",
-    "test:integration": "npx dotenv-cli -e .env.test prisma migrate dev && npx dotenv-cli -e .env.test nodemon src/server.ts",
-    "test:unit": "npx dotenv-cli -e .env.test prisma migrate dev &&  npx npx dotenv-cli -e .env.test jest -i --coverage"
+    "test:integration": "dotenv -e .env.test prisma migrate dev && NODE_OPTIONS=--experimental-vm-modules dotenv -e .env.test jest -- -i --testPathPattern=tests/integration",
+    "test:unit": "dotenv -e .env.test prisma migrate dev && NODE_OPTIONS=--experimental-vm-modules dotenv -e .env.test jest -- -i --coverage --testPathPattern=tests/unit"
   },
   "keywords": [],
   "author": "",

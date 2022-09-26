@@ -5,7 +5,7 @@ import {
     insertNewRecommendations
 } from "../factories/recomendationsFactory.js";
 import { faker } from "@faker-js/faker";
-import { type } from "os";
+
 
 const agent = supertest(app);
 

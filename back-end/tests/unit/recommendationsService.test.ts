@@ -6,8 +6,8 @@ import {
     createNewRecommendation,
     insertNewRecommendation,
     insertNewRecommendations,
-    updatedRecommendation,
-    registeredSongName
+    registeredSongName,
+    getRecommendationById
 } from "../factories/recomendationsFactory";
 
 
@@ -15,7 +15,7 @@ beforeEach(async () => {
     await prisma.$executeRaw`TRUNCATE TABLE recommendations RESTART IDENTITY`;
   });
 
-describe("recommendation services unit test suit", () => {
+describe("recommendation services unit test suite", () => {
     
     it(`given a valid recommendation data when isert a function is called then it shoul create a new recoomendation`, async () => {
 
@@ -39,6 +39,7 @@ describe("recommendation services unit test suit", () => {
         const result = recommendationService.insert(createData);
 
         expect(result).rejects.toEqual({type: "conflict", message:"Recommendations names must be unique"}); 
+        
     });
 
     it(`given a valid id when update function is called then it should incremenet the counting score`, async () => {
@@ -60,7 +61,7 @@ describe("recommendation services unit test suit", () => {
 
         const promise = recommendationService.upvote(id);
 
-        expect(promise).rejects.toEqual({type: "not_found", message:""})
+        expect(promise).rejects.toEqual({type: "not_found", message:""});
     });
 
     it(`given a valid id from a recommendation whose score is greater than -5 when downvote function is called then it should decrement the counting score`, async () => {
@@ -79,16 +80,16 @@ describe("recommendation services unit test suit", () => {
 
     it(`given a valid id from a recommendation whose score is equals to -5 when downvote function is called then it should get the corresponding recommendation and decrement its score and remove this recommendation`, async () => {
 
-        jest.spyOn(recommendationRepository, "find").mockImplementationOnce((): any => []);
+        jest.spyOn(recommendationRepository, "find").mockImplementationOnce((): any => recommendation);
         jest.spyOn(recommendationRepository, "updateScore").mockImplementationOnce((): any => {
-            return {...[], score: -6};
+            return {...recommendation, score: -6};
         });
         jest.spyOn(recommendationRepository, "remove").mockImplementationOnce((): any => {});
 
         const create = await createNewRecommendation();
-        const result = {...create, id: 1, score: -5};
+        const recommendation = {...create, id: 1, score: -5};
 
-        await recommendationService.downvote(result.id);
+        await recommendationService.downvote(recommendation.id);
 
         expect(recommendationRepository.find).toBeCalled();
         expect(recommendationRepository.updateScore).toBeCalled();
@@ -125,10 +126,11 @@ describe("recommendation services unit test suit", () => {
    it(`give a invalid id when the function GetByIdOrFail is called then it should return a not found error`, async () => {
     const id = -1;
 
-    const promise = recommendationService.getById(id);
+    const promise = recommendationService.downvote(id);
 
     expect(promise).rejects.toEqual({type: "not_found", message: ""});
-});
+    
+    });
 
     it(`give a valid amount, it will be incremented for each register. When the getTop function is called then is should return the amounts recommendations ordered by score`, async () => {
         jest.spyOn(recommendationRepository, "getAmountByScore").mockImplementationOnce((): any => []);
@@ -154,7 +156,7 @@ describe("recommendation services unit test suit", () => {
     });
 
     it(`given that there are one or more recommendation registered when getRamdom function is called then it should return a radom recommendation`, async () => {
-        jest.spyOn(Math, "random").mockImplementationOnce((): any => 0.1);
+        jest.spyOn(Math, "random").mockImplementationOnce(() => 0.1);
 
         jest.spyOn(recommendationRepository, "findAll").mockImplementationOnce((): any => recommendations);
 
@@ -167,7 +169,8 @@ describe("recommendation services unit test suit", () => {
             {...recommendation, id: 2, name: "bbb", score: -1},
             {...recommendation, id: 3, name: "ccc", score: -2},
         ];
-        const result = await recommendationService.getRandom();
+        
+        await recommendationService.getRandom();
 
         expect(Math.random).toBeCalled();
         expect(recommendationRepository.findAll).toBeCalled();
@@ -175,7 +178,9 @@ describe("recommendation services unit test suit", () => {
     });
 
     it(`give that are no recommendations registered yet when getRandom is called the it should return a not found error`, async () => {
-        jest.spyOn(Math, "random").mockImplementationOnce(() => {return 0.8});
+        jest.spyOn(Math, "random").mockImplementationOnce(() => {
+            return 0.8;
+        });
 
         jest.spyOn(recommendationRepository, "findAll").mockImplementationOnce((): any => []);
 
@@ -185,6 +190,26 @@ describe("recommendation services unit test suit", () => {
             type: "not_found",
             message: "",
         });
+    });
+
+    it("test function getRecommendationById", async () => {
+        const recommendation = await insertNewRecommendation();
+        const maximumScore = 1000;
+        const randomScore = Math.floor(Math.random() * maximumScore + 1);
+        const result = await prisma.recommendation.update({
+            where : {
+                id: recommendation.id,
+            },
+            data: {
+                score: randomScore,
+            },
+        });
+
+        const recAfter = await getRecommendationById(recommendation.id);
+        
+
+        expect(result.id).toEqual(recAfter.id);
+        
     });
 });
 

@@ -1,7 +1,6 @@
 import { faker } from "@faker-js/faker";
-import { Recommendation } from "@prisma/client";
 import prisma from "../../src/database";
-import { CreateRecommendationData } from "../../src/services/recommendationsService";
+
 
 export async function createNewRecommendation() {
     let name: string = "";
@@ -40,11 +39,6 @@ export async function insertNewRecommendations(n: number) {
     }
   }
 
-export async function updatedRecommendation(n: number){
-    for (let i = 0; i < n; i++){
-        await insertNewRecommendation();
-    }
-}
 
 
 export async function registeredSongName(){
